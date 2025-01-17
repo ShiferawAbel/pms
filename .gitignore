@@ -1,23 +1,44 @@
-/vendor/
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Laravel 4 specific
-bootstrap/compiled.php
-app/storage/
-
-# Laravel 5 & Lumen specific
-public/storage
-public/hot
-
-# Laravel 5 & Lumen specific with changed public path
-public_html/storage
-public_html/hot
-
-storage/*.key
+# Ignore the .env file and other environment files
 .env
+.env.*.backup
+
+# Node modules for React
+/node_modules
+
+# Laravel specific
+/vendor
+/public/hot
+/public/storage
+/storage/*.key
+/storage/framework/*
+/storage/logs/*
+/bootstrap/cache/*
+
+# Ignore composer.lock if you don't want to track it
+# (optional, depends on your version control strategy)
+/composer.lock
+
+# Ignore npm debug log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore assets built by Vite
+/public/build
+/public/mix-manifest.json
+/public/assets
+
+# IDE-specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Ignore deployment-specific files
 Homestead.yaml
 Homestead.json
-/.vagrant
-.phpunit.result.cache
+*.pem

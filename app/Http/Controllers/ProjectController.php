@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectStoreRequest;
+use App\Http\Requests\ProjectUpdateRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -20,6 +22,7 @@ class ProjectController extends Controller
         
         $sortColumn = request("sortColumn", "created_at");
         $sortDirection = request("sortDirection", "desc");
+        $success ='';
 
         $query = Project::query();
 
@@ -96,24 +99,52 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Project $project)
     {
-        //
+        return inertia('Project/Edit', [
+            'project' => new ProjectResource($project),
+        ]);
     }
-
+    
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProjectUpdateRequest $request, Project $project)
     {
-        //
+        $data = $request->validated();
+        $image = $data['image_path'] ?? null;
+        $data['updated_by'] = Auth::id();
+        
+        if ($image) {
+            if ($project->image_path && substr($project->image_path, 0, 7) == "project") {
+                if (Storage::disk('public')->exists($project->image_path)) {
+                    Storage::disk('public')->delete($project->image_path);
+                }
+            }
+            $data['image_path'] = $image->store('projects-image', 'public');
+        }
+
+        
+        $project->update($data);
+
+        return to_route('project.index')->with('success', 'Project "' . $project->name . '" has been deleted successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Project $project)
     {
-        //
+        $name = $project->name;
+
+        if ($project->image_path && substr($project->image_path, 0, 7) == "project") {
+            if (Storage::disk('public')->exists($project->image_path)) {
+                Storage::disk('public')->delete($project->image_path);
+            }
+        }
+
+        $project->delete();
+
+        return to_route('project.index')->with('success', 'Project "' . $name . '" has been deleted successfully');
     }
 }

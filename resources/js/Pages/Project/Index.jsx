@@ -39,6 +39,18 @@ const Index = ({ projects, queryParams = null, success }) => {
 
         router.get(route("project.index", queryParams));
     };
+
+    const deleteProject = (project) => {
+        if (
+            !window.confirm(
+                `Are you sure you want project "${project.name}" deleted?`
+            )
+        ) {
+            return;
+        }
+
+        router.delete(route("project.destroy", project.id));
+    };
     return (
         <AuthenticatedLayout
             header={
@@ -58,7 +70,7 @@ const Index = ({ projects, queryParams = null, success }) => {
         >
             <Head title="Projects" />
             {success && (
-                <div class="fixed top-4 right-4 bg-blue-500 text-white text-sm font-medium px-4 py-3 rounded shadow-lg">
+                <div class="fixed top-4 right-4 bg-orange-500 text-white text-sm font-medium px-4 py-3 rounded shadow-lg">
                     <span>{success}</span>
                     <button
                         class="ml-4 text-white hover:text-blue-200"
@@ -238,7 +250,7 @@ const Index = ({ projects, queryParams = null, success }) => {
                                             <td className="px-3 py-2">
                                                 {project.created_by.name}
                                             </td>
-                                            <td className="px-3 py-2">
+                                            <td className="px-3 py-2 text-nowrap">
                                                 <Link
                                                     href={route(
                                                         "project.edit",
@@ -248,15 +260,14 @@ const Index = ({ projects, queryParams = null, success }) => {
                                                 >
                                                     Edit
                                                 </Link>
-                                                <Link
-                                                    href={route(
-                                                        "project.destroy",
-                                                        project.id
-                                                    )}
+                                                <button
+                                                    onClick={(e) =>
+                                                        deleteProject(project)
+                                                    }
                                                     className="font-medium mx-1 hover:text-red-500 dark:text-red-400 text-red-500"
                                                 >
                                                     Delete
-                                                </Link>
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

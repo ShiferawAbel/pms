@@ -1,16 +1,13 @@
 import Pagination from "@/Components/Pagination";
-import SelectInput from "@/Components/SelectInput";
 import TextInput from "@/Components/TextInput";
-import { PROJECT_STATUS_CLASS_MAP, PROJECT_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import TableHeading from "@/Components/TableHeading";
-import PrimaryButton from "@/Components/PrimaryButton";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-const Index = ({ projects, queryParams = null, success }) => {
+const Index = ({ users, queryParams = null, success }) => {
     queryParams = queryParams || {};
-    const projectsList = projects.data;
+    const usersList = users.data;
 
     const searchFieldChanged = (column, filter) => {
         if (filter) {
@@ -19,7 +16,7 @@ const Index = ({ projects, queryParams = null, success }) => {
             delete queryParams[column];
         }
 
-        router.get(route("project.index", queryParams));
+        router.get(route("user.index", queryParams));
     };
 
     const onKeyDown = (column, e) => {
@@ -37,19 +34,29 @@ const Index = ({ projects, queryParams = null, success }) => {
             queryParams.sortDirection = "asc";
         }
 
-        router.get(route("project.index", queryParams));
+        router.get(route("user.index", queryParams));
     };
 
+    const deleteUser = (user) => {
+        if (
+            !window.confirm(
+                `Are you sure you want user "${user.name}" deleted?`
+            )
+        ) {
+            return;
+        }
 
+        router.delete(route("user.destroy", user.id));
+    };
     return (
         <AuthenticatedLayout
             header={
                 <div className="flex justify-between">
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                        Projects
+                        Users
                     </h2>
                     <Link
-                        href={route("project.create")}
+                        href={route("user.create")}
                         className="inline-flex items-center rounded-md border border-transparent bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:bg-gray-900 dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-white dark:focus:bg-white dark:focus:ring-offset-gray-800 dark:active:bg-gray-300"
                     >
                         <PlusIcon className="w-4 font-bold mr-2" />
@@ -58,7 +65,7 @@ const Index = ({ projects, queryParams = null, success }) => {
                 </div>
             }
         >
-            <Head title="Projects" />
+            <Head title="Users" />
             {success && (
                 <div class="fixed top-4 right-4 bg-orange-500 text-white text-sm font-medium px-4 py-3 rounded shadow-lg">
                     <span>{success}</span>
@@ -88,7 +95,6 @@ const Index = ({ projects, queryParams = null, success }) => {
                                         >
                                             ID
                                         </TableHeading>
-                                        <th className="px-3 py-2">IMAGE</th>
                                         <TableHeading
                                             name={"name"}
                                             sortChanged={sortChanged}
@@ -107,7 +113,7 @@ const Index = ({ projects, queryParams = null, success }) => {
                                             }
                                             sortColumn={queryParams.sortColumn}
                                         >
-                                            STATUS
+                                            Email
                                         </TableHeading>
                                         <TableHeading
                                             name={"created_at"}
@@ -119,25 +125,11 @@ const Index = ({ projects, queryParams = null, success }) => {
                                         >
                                             CREATE DATE
                                         </TableHeading>
-                                        <TableHeading
-                                            name={"due_date"}
-                                            sortChanged={sortChanged}
-                                            sortDirection={
-                                                queryParams.sortDirection
-                                            }
-                                            sortColumn={queryParams.sortColumn}
-                                        >
-                                            DUE DATE
-                                        </TableHeading>
-                                        <th className="px-3 py-2">
-                                            CREATED BY
-                                        </th>
                                         <th className="px-3 py-2">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <thead className="text-x text-gray-300 uppercase bg-gray-50 dark:bg-gray-700 border-b-2 border-gray-500">
                                     <tr className="text-nowrap">
-                                        <th className="px-3 py-2"></th>
                                         <th className="px-3 py-2"></th>
                                         <th className="px-3 py-2">
                                             <TextInput
@@ -156,95 +148,56 @@ const Index = ({ projects, queryParams = null, success }) => {
                                             />
                                         </th>
                                         <th className="px-3 py-2">
-                                            <SelectInput
-                                                defaultValue={
-                                                    queryParams.status
-                                                }
+                                        <TextInput
+                                                defaultValue={queryParams.email}
                                                 className="w-full"
-                                                onChange={(e) =>
+                                                placeHolder="Search Names"
+                                                onBlur={(e) =>
                                                     searchFieldChanged(
-                                                        "status",
+                                                        "email",
                                                         e.target.value
                                                     )
                                                 }
-                                            >
-                                                <option value="">
-                                                    Filter Status
-                                                </option>
-                                                <option value="pending">
-                                                    Pending
-                                                </option>
-                                                <option value="in_progress">
-                                                    In Progress
-                                                </option>
-                                                <option value="completed">
-                                                    Completed
-                                                </option>
-                                            </SelectInput>
+                                                onKeyDown={(e) =>
+                                                    onKeyDown("name", e)
+                                                }
+                                            />
                                         </th>
-                                        <th className="px-3 py-2"></th>
-                                        <th className="px-3 py-2"></th>
                                         <th className="px-3 py-2"></th>
                                         <th className="px-3 py-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {projectsList.map((project) => (
+                                    {usersList.map((user) => (
                                         <tr
-                                            key={project.id}
+                                            key={user.id}
                                             className="bg-white border-b dark:bg-gray-800 dark:border-gray-400"
                                         >
                                             <td className="px-3 py-2">
-                                                {project.id}
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <img
-                                                    style={{ width: 60 }}
-                                                    src={project.image_path}
-                                                    alt=""
-                                                />{" "}
+                                                {user.id}
                                             </td>
                                             <td className="px-3 py-2">
                                                 <Link
                                                     href={route(
-                                                        "project.show",
-                                                        project
+                                                        "user.show",
+                                                        user
                                                     )}
                                                     className="dark:text-gray-300 hover:underline"
                                                 >
-                                                    {project.name}
+                                                    {user.name}
                                                 </Link>
                                             </td>
                                             <td className="px-3 py-2 ">
-                                                <span
-                                                    className={
-                                                        "px-2 py-1 text-white rounded " +
-                                                        PROJECT_STATUS_CLASS_MAP[
-                                                            project.status
-                                                        ]
-                                                    }
-                                                >
-                                                    {
-                                                        PROJECT_STATUS_TEXT_MAP[
-                                                            project.status
-                                                        ]
-                                                    }
-                                                </span>
+                                                {user.email}
                                             </td>
                                             <td className="px-3 py-2 text-nowrap">
-                                                {project.created_at}
-                                            </td>
-                                            <td className="px-3 py-2 text-nowrap">
-                                                {project.due_date}
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                {project.created_by.name}
+                                                {user.created_at}
                                             </td>
                                             <td className="px-3 py-2 text-nowrap">
                                                 <Link
                                                     href={route(
-                                                        "project.edit",
-                                                        project.id
+                                                        "user.edit",
+                                                        user.id
                                                     )}
                                                     className="font-medium mx-1 hover:text-blue-500 dark:text-blue-400 text-blue-500"
                                                 >
@@ -252,7 +205,7 @@ const Index = ({ projects, queryParams = null, success }) => {
                                                 </Link>
                                                 <button
                                                     onClick={(e) =>
-                                                        deleteProject(project)
+                                                        deleteUser(user)
                                                     }
                                                     className="font-medium mx-1 hover:text-red-500 dark:text-red-400 text-red-500"
                                                 >
@@ -263,7 +216,7 @@ const Index = ({ projects, queryParams = null, success }) => {
                                     ))}
                                 </tbody>
                             </table>
-                            <Pagination links={projects.meta.links} />
+                            <Pagination links={users.meta.links} />
                         </div>
                     </div>
                 </div>

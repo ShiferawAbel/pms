@@ -78,7 +78,7 @@ class ProjectController extends Controller
         $sortDirection = request("sortDirection", "desc");
         
         $query = $project->tasks();
-        dd($query);
+
         if (request("name")) {
             $query->where("name", "LIKE", "%" . request("name") . "%");
         }

@@ -16,6 +16,8 @@ const TaskTable = ({ tasks, queryParams }) => {
         router.get(route("task.index", queryParams));
     };
 
+    console.log(tasks);
+
     const onKeyDown = (column, e) => {
         if (e.key !== "Enter") return;
 
@@ -31,9 +33,20 @@ const TaskTable = ({ tasks, queryParams }) => {
             queryParams.sortDirection = "asc";
         }
 
-        router.get(route("task.index", queryParams));
+        router.get(route("task.index", queryParams, { only: ["tasks"] }));
     };
 
+    const deleteTask = (task) => {
+        if (
+            !window.confirm(
+                `Are you sure you want task "${task.name}" deleted?`
+            )
+        ) {
+            return;
+        }
+
+        router.delete(route("task.destroy", task.id));
+    };
     return (
         <div className="overflow-auto">
             <table className="w-full text-sm text-left rtl:left-right text-gray-500 dark:text-gray-400 overflow-auto">
@@ -136,7 +149,11 @@ const TaskTable = ({ tasks, queryParams }) => {
                                 />{" "}
                             </td>
                             <td className="px-3 py-2">{task.name}</td>
-                            <td className="px-3 py-2">{task.project.name}</td>
+                            <td className="px-3 py-2">
+                                {task.project
+                                    ? task.project.name
+                                    : "Not assigned to a project"}
+                            </td>
                             <td className="px-3 py-2 ">
                                 <span
                                     className={
@@ -161,12 +178,12 @@ const TaskTable = ({ tasks, queryParams }) => {
                                 >
                                     Edit
                                 </Link>
-                                <Link
-                                    href={route("task.destroy", task.id)}
+                                <button
+                                    onClick={(e) => deleteTask(task)}
                                     className="font-medium mx-1 hover:text-red-500 dark:text-red-400 text-red-500"
                                 >
                                     Delete
-                                </Link>
+                                </button>
                             </td>
                         </tr>
                     ))}

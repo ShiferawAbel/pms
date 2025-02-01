@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,7 @@ class TaskFactory extends Factory
             'priority' => fake()->randomElement(['low', 'medium', 'high']),
             'image_path' => 'https://picsum.photos/200',
             'assigned_user_id' => 1,
+            'project_id' => Project::factory(),
             'created_by' => 1,
             'updated_by' => 1,
         ];

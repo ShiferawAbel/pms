@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('assigned_user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('set null');
+            $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('CASCADE');
             $table->timestamp('due_date')->nullable();
             $table->timestamps();            
         });

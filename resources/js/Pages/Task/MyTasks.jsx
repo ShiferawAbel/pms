@@ -3,7 +3,7 @@ import { Deferred, Head, Link, router } from "@inertiajs/react";
 import TaskTable from "./TaskTable";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-const Index = ({ tasks, queryParams = null, success }) => {
+const MyTasks = ({ tasks, queryParams = null, success }) => {
     queryParams = queryParams || {};
 
     return (
@@ -50,4 +50,4 @@ const Index = ({ tasks, queryParams = null, success }) => {
     );
 };
 
-export default Index;
+export default MyTasks;
